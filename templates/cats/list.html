@@ -1,0 +1,57 @@
+{% extends 'cats/base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="d-flex justify-content-end mb-3">
+    <a href="{% url 'cats:create' %}" class="btn btn-primary">+ Post Something</a>
+</div>
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h1 class="h3">All Posts</h1>
+  <form class="d-flex" method="get">
+    <input class="form-control me-2" name="q" type="search" placeholder="Search" value="{{ request.GET.q }}">
+    <select name="status" class="form-select me-2">
+      <option value="">All</option>
+      <option value="Lost" {% if request.GET.status == 'Lost' %}selected{% endif %}>Lost</option>
+      <option value="Found" {% if request.GET.status == 'Found' %}selected{% endif %}>Found</option>
+    </select>
+    <button class="btn btn-outline-secondary" type="submit">Filter</button>
+  </form>
+</div>
+
+<div class="row">
+  {% for post in posts %}
+  <div class="col-md-4 mb-4">
+    <div class="card h-100 shadow-sm card-hover">
+      <img src="{{ post.image.url }}" class="card-img-top" style="object-fit: cover; height: 220px;" alt="{{ post.title }}">
+      <div class="card-body d-flex flex-column">
+        <h5 class="card-title">{{ post.title }}</h5>
+        <p class="mb-1"><strong>Location:</strong> {{ post.location }}</p>
+        <span class="badge {% if post.status == 'Lost' %}bg-danger{% else %}bg-success{% endif %}">{{ post.status }}</span>
+        <div class="mt-auto pt-3">
+          <a href="{% url 'cats:post_detail' post.pk %}" class="btn btn-primary w-100">View Details</a>
+        </div>
+      </div>
+    </div>
+  </div>
+  {% empty %}
+  <p class="text-center">No posts yet. Be the first to <a href="{% url 'cats:create' %}">post a pet</a>!</p>
+  {% endfor %}
+</div>
+
+<div class="d-flex justify-content-center mt-4">
+  {% if is_paginated %}
+    <nav>
+      <ul class="pagination">
+        {% if page_obj.has_previous %}
+          <li class="page-item"><a class="page-link" href="?page={{ page_obj.previous_page_number }}">Previous</a></li>
+        {% endif %}
+        <li class="page-item disabled"><span class="page-link">Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span></li>
+        {% if page_obj.has_next %}
+          <li class="page-item"><a class="page-link" href="?page={{ page_obj.next_page_number }}">Next</a></li>
+        {% endif %}
+      </ul>
+    </nav>
+  {% endif %}
+</div>
+{% endblock %}

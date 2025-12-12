@@ -1,0 +1,68 @@
+
+{% extends 'cats/base.html' %}
+{% load static %}
+
+{% block content %}
+<link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+
+  <div class="row">
+    <div class="col-md-8">
+      <img src="{{ post.image.url }}" alt="{{ post.title }}" class="img-fluid rounded">
+    </div>
+    <div class="col-md-4">
+      <h2>{{ post.title }}</h2>
+      <p><span class="badge {% if post.status == 'Lost' %}bg-danger{% else %}bg-success{% endif %}">{{ post.status }}</span></p>
+      <p><strong>Location:</strong> {{ post.location }}</p>
+      <p><strong>Date Posted:</strong> {{ post.created_at|date:"F j, Y, g:i a" }}</p>
+      <hr>
+      <p>{{ post.description }}</p>
+      <a href="{% url 'cats:list' %}" class="btn btn-outline-primary mt-3">Back to all posts</a>
+    </div>
+  </div>
+
+<h3 class="mt-4">Location Map</h3>
+<div id="map" style="height: 300px;" class="mb-4"></div>
+
+<h3 class="mt-4">Comments</h3>
+
+{% for comment in post.comments.all %}
+<div class="border p-2 mb-2 rounded">
+    <strong>{{ comment.name }}</strong>
+    <small>{{ comment.created_at }}</small>
+    <p>{{ comment.message }}</p>
+</div>
+{% empty %}
+<p>No comments yet.</p>
+{% endfor %}
+
+<h4 class="mt-4">Leave a Comment</h4>
+<form method="POST" action="{% url 'cats:post_detail' post.pk %}">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button class="btn btn-success">Submit Comment</button>
+</form>
+<script>
+    const locationText = "{{ post.location|escapejs }}";
+
+    fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${locationText}`)
+        .then(response => response.json())
+        .then(data => {
+            if (data.length === 0) return;
+
+            const lat = data[0].lat;
+            const lon = data[0].lon;
+
+            const map = L.map('map').setView([lat, lon], 14);
+
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                maxZoom: 19,
+            }).addTo(map);
+
+            L.marker([lat, lon]).addTo(map)
+              .bindPopup("{{ post.location }}")
+              .openPopup();
+        });
+</script>
+
+{% endblock %}

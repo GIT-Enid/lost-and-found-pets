@@ -1,0 +1,27 @@
+
+/* Basic small styling to complement bootstrap */
+/*body { padding-bottom: 60px; }
+.card-img-top { object-fit: cover; }*/
+
+
+body {
+    background-color: #f8f9fa;
+}
+
+.card {
+    border-radius: 12px;
+    transition: transform 0.2s;
+}
+.card:hover {
+    transform: scale(1.02);
+    box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+}
+
+footer {
+    padding: 20px 0;
+    color: #777;
+}
+
+.navbar .btn-primary {
+    margin-left: 10px;
+}
