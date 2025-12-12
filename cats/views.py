@@ -52,3 +52,7 @@ def cat_detail(request, pk):
         "post": post,
         "form": form,
     })
+
+def home(request):
+    return render(request, "cats/home.html")
+

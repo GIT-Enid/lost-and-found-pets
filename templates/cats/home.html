@@ -1,0 +1,25 @@
+{% extends "cats/base.html" %}
+{% load static %}
+
+{% block content %}
+<div class="hero-section">
+
+  <div class="hero-text">
+    <h1>Find &<br><span class="highlight">Reunite<br>With Your Pets</span></h1>
+    <p class="subtitle">Experience effortless recovery with our dedicated lost and found service.</p>
+
+    <div class="hero-buttons">
+      <a href="{% url 'cats:list' %}?status=Lost" class="btn-hero lost">Lost</a>
+      <a href="{% url 'cats:list' %}?status=Found" class="btn-hero found">Found</a>
+    </div>
+  </div>
+
+  <div class="hero-images">
+    <img src="{% static 'cats/img/pet1.jpg' %}" class="img-1" />
+    <img src="{% static 'cats/img/pet2.jpg' %}" class="img-2" />
+    <img src="{% static 'cats/img/pet3.jpg' %}" class="img-3" />
+  </div>
+
+</div>
+
+{% endblock %}

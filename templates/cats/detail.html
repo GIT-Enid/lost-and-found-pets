@@ -1,68 +1,99 @@
-
 {% extends 'cats/base.html' %}
 {% load static %}
 
 {% block content %}
-<link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
-<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
 
-  <div class="row">
-    <div class="col-md-8">
-      <img src="{{ post.image.url }}" alt="{{ post.title }}" class="img-fluid rounded">
+<div class="detail-container smooth-card">
+
+    <!-- Left side: image -->
+    <div class="detail-left">
+        <img src="{{ post.image.url }}" alt="{{ post.title }}" class="detail-img rounded">
     </div>
-    <div class="col-md-4">
-      <h2>{{ post.title }}</h2>
-      <p><span class="badge {% if post.status == 'Lost' %}bg-danger{% else %}bg-success{% endif %}">{{ post.status }}</span></p>
-      <p><strong>Location:</strong> {{ post.location }}</p>
-      <p><strong>Date Posted:</strong> {{ post.created_at|date:"F j, Y, g:i a" }}</p>
-      <hr>
-      <p>{{ post.description }}</p>
-      <a href="{% url 'cats:list' %}" class="btn btn-outline-primary mt-3">Back to all posts</a>
+
+    <!-- Right side: details -->
+    <div class="detail-right">
+        <h1 class="detail-title">{{ post.title }}</h1>
+
+        <span class="status-badge {% if post.status == 'Lost' %}lost{% else %}found{% endif %}">
+            {{ post.status }}
+        </span>
+
+        <p><i class="bi bi-geo-alt"></i> <strong>Location:</strong> {{ post.location }}</p>
+        <p><i class="bi bi-calendar"></i> <strong>Date:</strong> {{ post.created_at|date:"F j, Y, g:i a" }}</p>
+
+        <hr>
+
+        <p class="description">{{ post.description }}</p>
+
+        <a href="{% url 'cats:list' %}" class="btn-back">
+            <i class="bi bi-arrow-left"></i> Back to all posts
+        </a>
     </div>
-  </div>
 
-<h3 class="mt-4">Location Map</h3>
-<div id="map" style="height: 300px;" class="mb-4"></div>
+</div>
 
-<h3 class="mt-4">Comments</h3>
+<!-- Map section -->
+<h3 class="section-title">Location Map</h3>
+<div id="map" class="detail-map"></div>
+
+<!-- Comments section -->
+<h3 class="section-title">Comments</h3>
 
 {% for comment in post.comments.all %}
-<div class="border p-2 mb-2 rounded">
+<div class="comment-box smooth-card">
     <strong>{{ comment.name }}</strong>
-    <small>{{ comment.created_at }}</small>
+    <small>{{ comment.created_at|date:"F j, Y, g:i a" }}</small>
     <p>{{ comment.message }}</p>
 </div>
 {% empty %}
 <p>No comments yet.</p>
 {% endfor %}
 
-<h4 class="mt-4">Leave a Comment</h4>
-<form method="POST" action="{% url 'cats:post_detail' post.pk %}">
+<h4 class="section-title">Leave a Comment</h4>
+<form method="POST" action="{% url 'cats:post_detail' post.pk %}" class="comment-form smooth-card">
     {% csrf_token %}
     {{ form.as_p }}
-    <button class="btn btn-success">Submit Comment</button>
+    <button class="btn-submit-comment">Submit Comment</button>
 </form>
+
+
+
 <script>
+document.addEventListener("DOMContentLoaded", function() {
     const locationText = "{{ post.location|escapejs }}";
+
+    if (!locationText) {
+        document.getElementById("map").innerHTML = "<p>Location not available</p>";
+        return;
+    }
 
     fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${locationText}`)
         .then(response => response.json())
         .then(data => {
-            if (data.length === 0) return;
+            if (!data || data.length === 0) {
+                document.getElementById("map").innerHTML = "<p>Location not found</p>";
+                return;
+            }
 
-            const lat = data[0].lat;
-            const lon = data[0].lon;
+            const lat = parseFloat(data[0].lat);
+            const lon = parseFloat(data[0].lon);
 
             const map = L.map('map').setView([lat, lon], 14);
 
             L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                maxZoom: 19,
+                attribution: '&copy; OpenStreetMap contributors'
             }).addTo(map);
 
-            L.marker([lat, lon]).addTo(map)
-              .bindPopup("{{ post.location }}")
-              .openPopup();
+            L.marker([lat, lon])
+             .addTo(map)
+             .bindPopup(locationText)
+             .openPopup();
+        })
+        .catch(err => {
+            console.error("Error fetching location:", err);
+            document.getElementById("map").innerHTML = "<p>Map could not be loaded</p>";
         });
+});
 </script>
 
 {% endblock %}

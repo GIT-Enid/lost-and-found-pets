@@ -1,34 +1,36 @@
-
 {% extends 'cats/base.html' %}
 {% load static %}
 
 {% block content %}
-  <h1 class="h3 mb-3">Post a Pet</h1>
-  <div class="card p-4">
-    <form method="post" enctype="multipart/form-data">
-      {% csrf_token %}
-      <div class="mb-3">
-        <label class="form-label">Image</label>
-        {{ form.image }}
-      </div>
-      <div class="mb-3">
-        <label class="form-label">Title</label>
-        {{ form.title }}
-      </div>
-      <div class="mb-3">
-        <label class="form-label">Description</label>
-        {{ form.description }}
-      </div>
-      <div class="mb-3">
-        <label class="form-label">Location</label>
-        {{ form.location }}
-      </div>
-      <div class="mb-3">
-        <label class="form-label">Status</label>
-        {{ form.status }}
-      </div>
-      <button type="submit" class="btn btn-success">Submit</button>
-      <a href="{% url 'cats:list' %}" class="btn btn-secondary ms-2">Cancel</a>
-    </form>
-  </div>
+
+<div class="form-container">
+    <h1 class="form-title"><i class="bi bi-plus-circle"></i> Post a Pet</h1>
+
+    <div class="form-card smooth-card">
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+
+            <label class="form-label">Image</label>
+            {{ form.image }}
+
+            <label class="form-label">Title</label>
+            {{ form.title }}
+
+            <label class="form-label">Description</label>
+            {{ form.description }}
+
+            <label class="form-label">Location</label>
+            {{ form.location }}
+
+            <label class="form-label">Status</label>
+            {{ form.status }}
+
+            <div class="form-actions">
+                <button type="submit" class="btn-submit">Submit</button>
+                <a href="{% url 'cats:list' %}" class="btn-cancel">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+
 {% endblock %}
