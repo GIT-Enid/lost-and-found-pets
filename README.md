@@ -1,7 +1,7 @@
 
-# Lost & Found Cats
+# Lost & Found Pets
 
-This is a Django project scaffold for the "Lost & Found Cats" web application.
+This is a Django project scaffold for the "Lost & Found Pets" web application.
 Follow the instructions in the root README to run locally.
 
 ## Quick start
